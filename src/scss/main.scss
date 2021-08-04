@@ -1,0 +1,12 @@
+@import "_base.scss";
+@import "_vars.scss";
+@import "_fonts.scss"; 
+@import "_vendors.scss";
+@import "_media.scss";
+
+h1{
+    color: rgb(155, 30, 61);
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0;
+}
