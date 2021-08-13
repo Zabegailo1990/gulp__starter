@@ -4,10 +4,44 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/main.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.min.css">
     <title>Document</title>
 </head>
-<body>
-    <h1>hi</h1>
+<body class="root">
+    <div class="box">
+        <h1 class="box__title">testing</h1>
+        <div class="box__inner">
+            <div class="box__icons">
+                <div class="box__subtitle">Icons SVG</div>
+                <svg class="icon icon-svg">
+                    <use xlink:href="./img/icons/icons-sprite.svg#icon-delivery"></use>
+                </svg>
+                <svg class="icon icon-svg">
+                    <use xlink:href="./img/icons/icons-sprite.svg#icon-telegram"></use>
+                </svg>
+                <svg class="icon icon-svg">
+                    <use xlink:href="./img/icons/icons-sprite.svg#icon-vk"></use>
+                </svg>
+                <svg class="icon icon-svg">
+                    <use xlink:href="./img/icons/icons-sprite.svg#icon-instagram"></use>
+                </svg>
+                <svg class="icon icon-svg">
+                    <use xlink:href="./img/icons/icons-sprite.svg#icon-twitter"></use>
+                </svg>
+            </div>
+            <div class="box__icons">
+                <div class="box__subtitle">Icons PNG</div>
+                <i class="icon icon-png--vk"></i>
+                <i class="icon icon-png--instagram"></i>
+                <i class="icon icon-png--twitter"></i>
+                <i class="icon icon-png--telegram"></i>
+            </div>
+        </div>
+        <div class="box__images">
+            <div class="box__subtitle">Images after minify</div>
+            <img class="box__svg" src="./img/images/man.svg" alt="" >
+            <img class="box__img" src="./img/images/kadyn-pierce.jpg" alt="" >
+        </div>
+    </div>
 </body>
 </html>

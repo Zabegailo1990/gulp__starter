@@ -1,12 +1,18 @@
-h1, h2, h3 {
+.root{
+    margin: 0;
+    overflow-x: hidden;
+}
+
+.title,
+.subtitle{
     margin: 0;
 }
 
-p{
+.text{
     margin: 0;
 }
 
-a{
+.link{
     text-decoration: none;
     display: inline-block;
 }

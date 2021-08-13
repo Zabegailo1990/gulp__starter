@@ -1,0 +1,123 @@
+// SCSS variables are information about icon's compiled state, stored under its original file name
+//
+// .icon-home {
+//   width: $icon-home-width;
+// }
+//
+// The large array-like variables contain all information about a single icon
+// $icon-home: x y offset_x offset_y width height total_width total_height image_path;
+//
+// At the bottom of this section, we provide information about the spritesheet itself
+// $spritesheet: width height image $spritesheet-sprites;
+$instagram-name: 'instagram';
+$instagram-x: 0px;
+$instagram-y: 0px;
+$instagram-offset-x: 0px;
+$instagram-offset-y: 0px;
+$instagram-width: 32px;
+$instagram-height: 32px;
+$instagram-total-width: 84px;
+$instagram-total-height: 84px;
+$instagram-image: '../img/icons/icons-sprite.png';
+$instagram: (0px, 0px, 0px, 0px, 32px, 32px, 84px, 84px, '../img/icons/icons-sprite.png', 'instagram', );
+$telegram-name: 'telegram';
+$telegram-x: 52px;
+$telegram-y: 0px;
+$telegram-offset-x: -52px;
+$telegram-offset-y: 0px;
+$telegram-width: 32px;
+$telegram-height: 32px;
+$telegram-total-width: 84px;
+$telegram-total-height: 84px;
+$telegram-image: '../img/icons/icons-sprite.png';
+$telegram: (52px, 0px, -52px, 0px, 32px, 32px, 84px, 84px, '../img/icons/icons-sprite.png', 'telegram', );
+$twitter-name: 'twitter';
+$twitter-x: 0px;
+$twitter-y: 52px;
+$twitter-offset-x: 0px;
+$twitter-offset-y: -52px;
+$twitter-width: 32px;
+$twitter-height: 32px;
+$twitter-total-width: 84px;
+$twitter-total-height: 84px;
+$twitter-image: '../img/icons/icons-sprite.png';
+$twitter: (0px, 52px, 0px, -52px, 32px, 32px, 84px, 84px, '../img/icons/icons-sprite.png', 'twitter', );
+$vk-name: 'vk';
+$vk-x: 52px;
+$vk-y: 52px;
+$vk-offset-x: -52px;
+$vk-offset-y: -52px;
+$vk-width: 32px;
+$vk-height: 32px;
+$vk-total-width: 84px;
+$vk-total-height: 84px;
+$vk-image: '../img/icons/icons-sprite.png';
+$vk: (52px, 52px, -52px, -52px, 32px, 32px, 84px, 84px, '../img/icons/icons-sprite.png', 'vk', );
+$spritesheet-width: 84px;
+$spritesheet-height: 84px;
+$spritesheet-image: '../img/icons/icons-sprite.png';
+$spritesheet-sprites: ($instagram, $telegram, $twitter, $vk, );
+$spritesheet: (84px, 84px, '../img/icons/icons-sprite.png', $spritesheet-sprites, );
+
+// The provided mixins are intended to be used with the array-like variables
+//
+// .icon-home {
+//   @include sprite-width($icon-home);
+// }
+//
+// .icon-email {
+//   @include sprite($icon-email);
+// }
+//
+// Example usage in HTML:
+//
+// `display: block` sprite:
+// <div class="icon-home"></div>
+//
+// To change `display` (e.g. `display: inline-block;`), we suggest using a common CSS class:
+//
+// // CSS
+// .icon {
+//   display: inline-block;
+// }
+//
+// // HTML
+// <i class="icon icon-home"></i>
+@mixin sprite-width($sprite) {
+  width: nth($sprite, 5);
+}
+
+@mixin sprite-height($sprite) {
+  height: nth($sprite, 6);
+}
+
+@mixin sprite-position($sprite) {
+  $sprite-offset-x: nth($sprite, 3);
+  $sprite-offset-y: nth($sprite, 4);
+  background-position: $sprite-offset-x  $sprite-offset-y;
+}
+
+@mixin sprite-image($sprite) {
+  $sprite-image: nth($sprite, 9);
+  background-image: url(#{$sprite-image});
+}
+
+@mixin sprite($sprite) {
+  @include sprite-image($sprite);
+  @include sprite-position($sprite);
+  @include sprite-width($sprite);
+  @include sprite-height($sprite);
+}
+
+// The `sprites` mixin generates identical output to the CSS template
+//   but can be overridden inside of SCSS
+//
+// @include sprites($spritesheet-sprites);
+@mixin sprites($sprites) {
+  @each $sprite in $sprites {
+    $sprite-name: nth($sprite, 10);
+    .#{$sprite-name} {
+      @include sprite($sprite);
+    }
+  }
+}

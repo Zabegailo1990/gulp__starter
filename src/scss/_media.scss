@@ -1,19 +1,9 @@
 @import "_vars.scss";
 
+// @media (min-width: $mediaTablet) {
+    
+// }
 
-@mixin media-tablet {
-    @media (min-width: $mediaTablet) {
-        @content;
-    }
-}
+// @media (min-width: $mediaDesktop) {
 
-@mixin media-desktop {
-    @media (min-width: $mediaDesktop) {
-        @content;
-    }
-}
-
-
-// @include media-tablet{
-//     width:116px;
 // }

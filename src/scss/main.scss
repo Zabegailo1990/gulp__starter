@@ -1,12 +1,97 @@
 @import "_base.scss";
 @import "_vars.scss";
-@import "_fonts.scss"; 
+@import "_fonts.scss";
+@import "_sprite-img.scss";
 @import "_vendors.scss";
 @import "_media.scss";
 
-h1{
-    color: rgb(155, 30, 61);
-    text-align: center;
-    text-transform: uppercase;
+
+.root{
     margin: 0;
+    text-align: center;
 }
+
+.box{
+    box-sizing: border-box;
+    padding: 20px;
+    max-width: 700px;
+    margin: 0 auto;
+
+    &__title{
+        margin: 0;
+        text-transform: uppercase;
+        color: chocolate;
+        margin-bottom: 30px;
+    }
+
+    &__inner{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    &__icons:not(:last-child){
+        margin-right: 40px;
+    }
+
+    &__subtitle{
+        font-size: 20px;
+        font-weight: 700;
+        color: rgb(97, 89, 89);
+        margin-bottom: 20px;
+    }
+
+    &__svg{
+        width: 150px;
+        margin-right: 20px;
+    }
+
+    &__img{
+        width: 200px;
+        height: 150px;
+    }
+}
+
+.icon{
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-svg{
+    fill: rgb(40, 93, 161);
+    &:hover{
+        fill: rgb(156, 186, 224);
+    }
+}
+
+.icon-png--vk{
+    @include sprite($vk);
+    &:hover{
+        @include sprite($instagram)
+    }
+ }
+
+ .icon-png--instagram{
+    @include sprite($instagram);
+    &:hover{
+        @include sprite($twitter)
+    }
+ }
+
+ .icon-png--twitter{
+    @include sprite($twitter);
+    &:hover{
+        @include sprite($telegram)
+    }
+ }
+
+ .icon-png--telegram{
+    @include sprite($telegram);
+    &:hover{
+        @include sprite($vk)
+    }
+ }
+    
+

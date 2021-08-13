@@ -8,12 +8,14 @@ const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const cheerio = require ('gulp-cheerio');
 const imagemin = require ('gulp-imagemin');
-const svgSprite = require('gulp-svg-sprites');
 const svgmin = require('gulp-svgmin');
+const svgSprite = require('gulp-svg-sprites');
+const pngSprite = require('gulp.spritesmith');
 const del = require('del');
+const { render } = require('sass');
 
-// BrowserSync
-gulp.task('browserSync', function() {
+// BrowserSync***
+gulp.task('browserSync', function(){
     browserSync.init({
         server: {
             baseDir: "./app/"
@@ -22,13 +24,13 @@ gulp.task('browserSync', function() {
     });
 });
 
-//BrowserSync для HTML
+//BrowserSync для HTML***
 gulp.task('html', function(){
     return gulp.src('app/**/*.html')
         .pipe(browserSync.reload({ stream: true }));
 })
 
-// CSS компилятор
+// CSS компилятор***
 gulp.task('scss', function(){
     return gulp.src('src/scss/main.scss')
         .pipe(scss({outputStyle: 'compressed'}).on('error', scss.logError))
@@ -38,7 +40,7 @@ gulp.task('scss', function(){
         .pipe(browserSync.reload({stream: true}));
 })
 
-// Минификация JS
+// Минификация JS***
 gulp.task('js', function(){
     return gulp.src([
         'src/vendors/jquery/jquery.min.js',
@@ -51,37 +53,44 @@ gulp.task('js', function(){
         .pipe(browserSync.reload({stream: true}));
 })
 
-//Минификация jpeg, png, svg
+//Минификация jpeg, png***
 gulp.task('img', function(){
-    return gulp.src('src/img/images/*')
+    return gulp.src('src/img/images/*.{jpg,png}')
         .pipe(imagemin([
             imagemin.mozjpeg({quality: 75, progressive: true}),
-            imagemin.optipng({optimizationLevel: 5}),
-            imagemin.svgo({
-                plugins: [
-                    {removeViewBox: true},
-                    {cleanupIDs: true}
-                ]
-            })
+            imagemin.optipng({optimizationLevel: 5})
         ]))
         .pipe(gulp.dest('app/img/images/'));
 })
 
-// Создание SVG sprite
-gulp.task('svgSprite', function(){
-    return gulp.src('src/img/icons/svg/*.svg')
+//Минификация svg***
+gulp.task('svg', function(){
+    return gulp.src('src/img/images/*.svg')
         .pipe(svgmin({
+            multipass: true,
             js2svg: {
                 pretty: true,
+                indent: 4,
             },
-            // Иногда svgmin удаляет ViewBox, плагин который это устраняет
-            plugins: [{
-                name: 'removeViewBox',
-                active: false,
-            }],
+            plugins:[
+                {
+                    name: 'mergePaths',
+                    active: false
+                },
+                {
+                    name: 'collapseGroups',
+                    active: true
+                },
+            ]
         }))
+        .pipe(gulp.dest('app/img/images/'));
+})
+
+// Создание SVG sprite***
+gulp.task('svgSprite', function(){
+    return gulp.src('src/img/icons/svg/*.svg')
         .pipe(cheerio({
-            run: function ($) {
+            run: function($){
                 $('[fill]').removeAttr('fill');
                 $('[stroke]').removeAttr('stroke');
                 $('[style]').removeAttr('style');
@@ -90,33 +99,47 @@ gulp.task('svgSprite', function(){
         }))
         // После исполнения cheerio иногда, сивол '>' заменяется на '&gt', исправляем это с помощью gulp-replace
         .pipe(replace('&gt;', '>'))
-        // Создание спрайта
+        // Создание спрайта SYMBOL
         .pipe(svgSprite({
                 mode: "symbols",
-                preview: true,
-                selector: "icon-%f",
+                svgId: "icon-%f",
+                preview: false,
                 svg: {
-                    symbols: 'icons-sprite.svg',
+                    symbols: "icons-sprite.svg"
                 }
             }
         ))
         .pipe(gulp.dest('app/img/icons/'));
 })
 
-//Watch
-gulp.task('watch', function() {
+// Создание PNG спрайта***
+gulp.task('pngSprite', function(){
+    var spriteData = gulp.src('src/img/icons/png/*.png')
+        .pipe(pngSprite({
+            imgName: 'icons-sprite.png',
+            imgPath: '../img/icons/icons-sprite.png',
+            cssName: '_sprite-img.scss',
+            cssFormat: 'scss',
+            algorithm: 'binary-tree',
+            padding: 20
+        }));
+    return spriteData.img.pipe(gulp.dest('app/img/icons/')), spriteData.css.pipe(gulp.dest('src/scss/'));
+});
+
+//Watch***
+gulp.task('watch', function(){
 	gulp.watch('src/scss/**/*.scss', gulp.parallel('scss'));
 	gulp.watch('src/js/common.js', gulp.parallel('js'));
 	gulp.watch('app/*.html', gulp.parallel('html'));
 });
 
-// Команда для разработки
+// Удаление файлов/папок***
+gulp.task('del', function(){
+    return del.sync(['app/**', '!app/index.html']); 
+})
+
+// Команда для разработки***
 gulp.task('dev', gulp.parallel('watch', 'browserSync'));
 
-// Команда сборки
-gulp.task('prod', gulp.parallel('scss', 'js', 'svgSprite', 'img'));
-
-// Удаление файлов/папок
-gulp.task('del', function(){
-    return del.sync('app'); 
-})
+// Команда сборки***
+gulp.task('prod', gulp.parallel('del', 'scss', 'js', 'img', 'svg', 'svgSprite', 'pngSprite'));
