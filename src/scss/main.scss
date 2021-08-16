@@ -1,10 +1,8 @@
+@import "_fonts.scss";
+@import "_vendors.scss";
 @import "_base.scss";
 @import "_vars.scss";
-@import "_fonts.scss";
 @import "_sprite-img.scss";
-@import "_vendors.scss";
-@import "_media.scss";
-
 
 .root{
     margin: 0;
@@ -57,6 +55,7 @@
     display: inline-block;
     width: 32px;
     height: 32px;
+    cursor: pointer;
 }
 
 .icon-svg{
@@ -67,31 +66,33 @@
 }
 
 .icon-png--vk{
-    @include sprite($vk);
+    @include sprite($icon-vk);
     &:hover{
-        @include sprite($instagram)
+        @include sprite($icon-instagram)
     }
  }
 
  .icon-png--instagram{
-    @include sprite($instagram);
+    @include sprite($icon-instagram);
     &:hover{
-        @include sprite($twitter)
+        @include sprite($icon-twitter)
     }
  }
 
  .icon-png--twitter{
-    @include sprite($twitter);
+    @include sprite($icon-twitter);
     &:hover{
-        @include sprite($telegram)
+        @include sprite($icon-telegram)
     }
  }
 
  .icon-png--telegram{
-    @include sprite($telegram);
+    @include sprite($icon-telegram);
     &:hover{
-        @include sprite($vk)
+        @include sprite($icon-vk)
     }
  }
+
+ @import "_media.scss";
     
 

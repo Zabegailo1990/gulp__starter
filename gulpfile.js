@@ -1,18 +1,19 @@
 const gulp = require('gulp');
 const scss = require('gulp-sass')(require ('sass'));
+const cssClean = require('gulp-clean-css');
 const autoprefix = require('gulp-autoprefixer');
 const browserSync = require('browser-sync').create();
 const concat = require('gulp-concat');
 const uglify = require('gulp-uglify');
-const replace = require('gulp-replace');
 const rename = require('gulp-rename');
-const cheerio = require ('gulp-cheerio');
 const imagemin = require ('gulp-imagemin');
-const svgmin = require('gulp-svgmin');
+const svgo = require ('gulp-svgo');
 const svgSprite = require('gulp-svg-sprites');
 const pngSprite = require('gulp.spritesmith');
 const del = require('del');
 const { render } = require('sass');
+
+
 
 // BrowserSync***
 gulp.task('browserSync', function(){
@@ -24,21 +25,40 @@ gulp.task('browserSync', function(){
     });
 });
 
+
+
 //BrowserSync для HTML***
 gulp.task('html', function(){
     return gulp.src('app/**/*.html')
         .pipe(browserSync.reload({ stream: true }));
 })
 
-// CSS компилятор***
-gulp.task('scss', function(){
+
+
+// CSS компилятор ***
+    // Для команды gulp prod
+gulp.task('scssProd', function(){
     return gulp.src('src/scss/main.scss')
         .pipe(scss({outputStyle: 'compressed'}).on('error', scss.logError))
-        .pipe(autoprefix(['last 15 versions']))
+        .pipe(autoprefix(['last 5 versions']))
         .pipe(rename({suffix: '.min', prefix : ''}))
         .pipe(gulp.dest('app/css'))
-        .pipe(browserSync.reload({stream: true}));
 })
+
+    // Для команды gulp dev
+    gulp.task('scssDev', function(){
+        return gulp.src('src/scss/main.scss')
+            .pipe(scss({
+                outputStyle: 'expanded',
+                indentWidth: 4,
+            }))
+            .pipe(autoprefix(['last 5 versions']))
+            .pipe(rename({suffix: '.min', prefix : ''}))
+            .pipe(gulp.dest('app/css'))
+            .pipe(browserSync.reload({stream: true}));
+    })
+
+
 
 // Минификация JS***
 gulp.task('js', function(){
@@ -53,8 +73,18 @@ gulp.task('js', function(){
         .pipe(browserSync.reload({stream: true}));
 })
 
+
+
+//Шрифты***
+gulp.task('fonts', function(){
+    return gulp.src('src/fonts/*')
+    .pipe(gulp.dest('app/fonts'))
+})
+
+
+
 //Минификация jpeg, png***
-gulp.task('img', function(){
+gulp.task('imgMin', function(){
     return gulp.src('src/img/images/*.{jpg,png}')
         .pipe(imagemin([
             imagemin.mozjpeg({quality: 75, progressive: true}),
@@ -63,56 +93,54 @@ gulp.task('img', function(){
         .pipe(gulp.dest('app/img/images/'));
 })
 
+
+
 //Минификация svg***
-gulp.task('svg', function(){
+gulp.task('svgMin', function(){
     return gulp.src('src/img/images/*.svg')
-        .pipe(svgmin({
-            multipass: true,
+        .pipe(svgo({
             js2svg: {
                 pretty: true,
                 indent: 4,
             },
             plugins:[
-                {
-                    name: 'mergePaths',
-                    active: false
-                },
-                {
-                    name: 'collapseGroups',
-                    active: true
-                },
+                {mergePaths: false},
+                {collapseGroups: true},
             ]
         }))
         .pipe(gulp.dest('app/img/images/'));
 })
 
+
+
 // Создание SVG sprite***
+    // "Команда работает в ручном режиме"
 gulp.task('svgSprite', function(){
     return gulp.src('src/img/icons/svg/*.svg')
-        .pipe(cheerio({
-            run: function($){
-                $('[fill]').removeAttr('fill');
-                $('[stroke]').removeAttr('stroke');
-                $('[style]').removeAttr('style');
-            },
-            parserOptions: {xmlMode: true}
+        // Удаление атрибутов
+        .pipe(svgo({
+            plugins:[
+                {convertPathData: false},
+                {removeStyleElement: true},
+                {removeAttrs: {attrs: ['fill', 'stroke']}},
+            ]
         }))
-        // После исполнения cheerio иногда, сивол '>' заменяется на '&gt', исправляем это с помощью gulp-replace
-        .pipe(replace('&gt;', '>'))
         // Создание спрайта SYMBOL
         .pipe(svgSprite({
-                mode: "symbols",
-                svgId: "icon-%f",
-                preview: false,
-                svg: {
-                    symbols: "icons-sprite.svg"
-                }
+            mode: "symbols",
+            svgId: "icon-%f",
+            preview: false,
+            svg: {
+                symbols: "icons-sprite.svg"
             }
-        ))
+        }))
         .pipe(gulp.dest('app/img/icons/'));
 })
+ 
+
 
 // Создание PNG спрайта***
+    // "Команда работает в ручном режиме"
 gulp.task('pngSprite', function(){
     var spriteData = gulp.src('src/img/icons/png/*.png')
         .pipe(pngSprite({
@@ -120,26 +148,36 @@ gulp.task('pngSprite', function(){
             imgPath: '../img/icons/icons-sprite.png',
             cssName: '_sprite-img.scss',
             cssFormat: 'scss',
+            cssVarMap: function (sprite) {
+                sprite.name = 'icon-' + sprite.name;
+            },
             algorithm: 'binary-tree',
             padding: 20
         }));
     return spriteData.img.pipe(gulp.dest('app/img/icons/')), spriteData.css.pipe(gulp.dest('src/scss/'));
 });
 
+
+
 //Watch***
 gulp.task('watch', function(){
-	gulp.watch('src/scss/**/*.scss', gulp.parallel('scss'));
+	gulp.watch('src/scss/**/*.scss', gulp.parallel('scssDev'));
 	gulp.watch('src/js/common.js', gulp.parallel('js'));
 	gulp.watch('app/*.html', gulp.parallel('html'));
 });
+
+
 
 // Удаление файлов/папок***
 gulp.task('del', function(){
     return del.sync(['app/**', '!app/index.html']); 
 })
 
+
+
 // Команда для разработки***
-gulp.task('dev', gulp.parallel('watch', 'browserSync'));
+gulp.task('dev', gulp.parallel('scssDev', 'watch', 'browserSync'));
 
 // Команда сборки***
-gulp.task('prod', gulp.parallel('del', 'scss', 'js', 'img', 'svg', 'svgSprite', 'pngSprite'));
+    // "Перед исполнением команды, необходимо предварительно отключить команду Dev, иначе css файл не минифицируется "
+gulp.task('prod', gulp.parallel('del', 'scssProd', 'js', 'fonts', 'imgMin', 'svgMin'));
