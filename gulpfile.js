@@ -46,17 +46,17 @@ gulp.task('scssProd', function(){
 })
 
     // Для команды gulp dev
-    gulp.task('scssDev', function(){
-        return gulp.src('src/scss/main.scss')
-            .pipe(scss({
-                outputStyle: 'expanded',
-                indentWidth: 4,
-            }))
-            .pipe(autoprefix(['last 5 versions']))
-            .pipe(rename({suffix: '.min', prefix : ''}))
-            .pipe(gulp.dest('app/css'))
-            .pipe(browserSync.reload({stream: true}));
-    })
+gulp.task('scssDev', function(){
+    return gulp.src('src/scss/main.scss')
+        .pipe(scss({
+            outputStyle: 'expanded',
+            indentWidth: 4,
+        }))
+        .pipe(autoprefix(['last 5 versions']))
+        .pipe(rename({suffix: '.min', prefix : ''}))
+        .pipe(gulp.dest('app/css'))
+        .pipe(browserSync.reload({stream: true}));
+})
 
 
 
